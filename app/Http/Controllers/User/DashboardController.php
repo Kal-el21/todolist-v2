@@ -49,7 +49,7 @@ class DashboardController extends Controller
             ->groupBy('date')
             ->get();
 
-        $completedTasks = $user->tasks()
+        $weeklyCompletedTasks = $user->tasks()
             ->whereBetween('completed_at', [$startOfWeek, $endOfWeek])
             ->where('is_completed', true)
             ->select(DB::raw('DATE(completed_at) as date'), DB::raw('COUNT(*) as count'))
@@ -63,7 +63,7 @@ class DashboardController extends Controller
             }
         }
 
-        foreach ($completedTasks as $task) {
+        foreach ($weeklyCompletedTasks as $task) {
             $index = array_search($task->date, array_column($weeklyActivity, 'date'));
             if ($index !== false) {
                 $weeklyActivity[$index]['completed'] = $task->count;

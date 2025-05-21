@@ -20,8 +20,8 @@ class TaskController extends Controller
         $query = Task::where('user_id', Auth::id());
 
         // Filter by completed status
-        if ($request->has('completed')) {
-            $query->where('completed', $request->completed);
+        if ($request->has('is_completed')) {
+            $query->where('is_completed', $request->is_completed);
         }
 
         // Filter by project
@@ -71,6 +71,7 @@ class TaskController extends Controller
             'project_id' => 'required|exists:projects,id',
             'tags' => 'nullable|array',
             'tags.*' => 'string',
+            'is_completed' => 'sometimes|boolean',
         ]);
 
         // Verify the project belongs to the user
@@ -86,7 +87,7 @@ class TaskController extends Controller
             'description' => $request->description,
             'due_date' => $request->due_date,
             'priority' => $request->priority,
-            'completed' => false,
+            'is_completed' => false,
             'user_id' => Auth::id(),
             'project_id' => $request->project_id,
         ]);
@@ -145,7 +146,7 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'due_date' => 'sometimes|required|date',
             'priority' => 'sometimes|required|in:low,medium,high',
-            'completed' => 'sometimes|boolean',
+            'is_completed' => 'sometimes|boolean',
             'project_id' => 'sometimes|required|exists:projects,id',
             'tags' => 'nullable|array',
             'tags.*' => 'string',
@@ -162,7 +163,7 @@ class TaskController extends Controller
         }
 
         $task->update($request->only([
-            'title', 'description', 'due_date', 'priority', 'completed', 'project_id'
+            'title', 'description', 'due_date', 'priority', 'is_completed', 'project_id'
         ]));
 
         // Handle tags
@@ -195,7 +196,7 @@ class TaskController extends Controller
             ], 403);
         }
 
-        $task->completed = !$task->completed;
+        $task->is_completed = !$task->is_completed;
         $task->save();
 
         return response()->json([
